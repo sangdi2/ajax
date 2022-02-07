@@ -65,7 +65,7 @@
                         return alert("获取图书失败")
                     }
                     var rows=[];
-                    res.data.each(function(i,ele){
+                    $.each(res.data,function(i,ele){
                         rows.push('<tr><td>'+ele.id+'</td><td>'+ele.bookname+'</td><td>'+ele.author+'</td><td>'+ele.publisher+'</td><td><a href="javascript:;" class="del" data-id="'+ele.id+'">删除</a></td></tr>');
                     })
                     $("tbody").empty().append(rows.join(""));
@@ -101,7 +101,7 @@
                   $("#publisher").val("")
                 })
             })
-        })();
+        })
     </script>
 </body>
 </html>
