@@ -1,12 +1,98 @@
+
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+  <title>Document</title>
+  <!-- 导入页面的基本样式 -->
+  <link rel="stylesheet" href="./css/search.css" />
+  <!-- 导入 jQuery -->
+  <script src="./js/jquery.js"></script>
+  <!-- 导入模板引擎 -->
+  <script src="./js/template-web.js"></script>
+  <style>
+      .li:hover{
+         background-color: #eee;
+         cursor: pointer;
+      }
+  </style>
 </head>
+
 <body>
-    
+  <div class="container">
+    <!-- Logo -->
+    <img src="./img/taobao_logo.png" alt="" class="logo" />
+
+    <div class="box">
+      <!-- tab 栏 -->
+      <div class="tabs">
+        <div class="tab-active">宝贝</div>
+        <div>店铺</div>
+      </div>
+      <!-- 搜索区域（搜索框和搜索按钮） -->
+      <div class="search-box">
+        <input id="ipt" type="text" class="ipt" placeholder="请输入要搜索的内容" /><button class="btnSearch">
+          搜索
+        </button>
+      </div>
+      <!-- 搜索建议列表 -->
+      <div id="suggest-list"></div>
+    </div>
+  </div>
+
+  <!-- 模板结构 -->
+  <script id="suggest" type="text/html">
+      {{each result}}
+        <div class="li" style="padding: 10px 15px;">{{$value[0]}}</div>
+      {{/each}}
+  </script>
+
+  <script>
+    $(function(){
+        var timmer=null;
+        var cache=[];
+        function fangdou(keywords){
+          timmer=setTimeout(function(){
+            getsuggest(keywords);
+          },500)
+        }
+        $("#ipt").on("keyup",function(){
+            clearTimeout(timmer);
+            var keywords=$("#ipt").val().trim();
+            if(keywords.length<=0)
+            {
+                return $("#suggest-list").empty().hide()
+            }
+            if(cache[keywords])
+            {
+                return fangdou(cache[keywords])
+            }
+            fangdou(keywords);
+        })
+        function getsuggest(kw){
+            $.ajax({
+                url:'https://suggest.taobao.com/sug?q='+kw,
+                dataType:'jsonp',
+                success:function(res){
+                    readersuggest(res)
+                }
+            })
+        }
+        function readersuggest(res){
+            if(res.result.length<=0)
+            {
+                return $("#suggest-list").empty().hide()
+            }
+           var htmlstr=template('suggest',res);
+           $("#suggest-list").html(htmlstr).show();
+           var k=$("#ipt").val().trim();
+           cache[k]=res;
+        }
+    })
+  </script>
 </body>
+
 </html>
